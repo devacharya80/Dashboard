@@ -1,18 +1,46 @@
-import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
+import SummaryCard from "../components/SummaryCard";
+import UploadForm from "../components/UploadForm";
+import DashboardChart from "../components/DashboardChart";
+import DiscrepancyTable from "../components/DiscrepancyTable";
 
 function Dashboard() {
-  const { user, logout } = useAuth();
-
   return (
-    <div className="container mt-5">
-      <h2>Dashboard</h2>
+    <>
+      <Navbar />
 
-      <h4>Welcome {user?.name}</h4>
+      <div className="container mt-4">
+        <div className="row g-4">
+          <div className="col-md-3">
+            <SummaryCard title="Orders" value="0" />
+          </div>
 
-      <button className="btn btn-danger mt-3" onClick={logout}>
-        Logout
-      </button>
-    </div>
+          <div className="col-md-3">
+            <SummaryCard title="Payments" value="0" />
+          </div>
+
+          <div className="col-md-3">
+            <SummaryCard title="Discrepancies" value="0" />
+          </div>
+
+          <div className="col-md-3">
+            <SummaryCard title="Money At Risk" value="$0" />
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <UploadForm />
+        </div>
+
+        <div className="mt-5">
+          <DashboardChart />
+        </div>
+
+        <div className="mt-5">
+          <DiscrepancyTable />
+        </div>
+      </div>
+    </>
   );
 }
 
