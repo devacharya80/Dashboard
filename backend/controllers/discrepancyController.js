@@ -3,12 +3,16 @@ import Discrepancy from "../models/Discrepancy.js";
 export const getDiscrepancies = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { type } = req.query;
+    const { type, severity } = req.query;
 
     const filter = { user: userId };
 
     if (type) {
       filter.type = type;
+    }
+
+    if (severity) {
+      filter.severity = severity;
     }
 
     const discrepancies = await Discrepancy.find(filter).sort({
