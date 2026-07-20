@@ -210,7 +210,7 @@ backend sends the discrepancy details to Google Gemini, which returns:
 
 ### AI Explanation
 
-![AI Output](screenshots/ai-output.png)
+![AI Output](screenshots/aiOutput.png)
 
 ## 🚀 Deployment
 
