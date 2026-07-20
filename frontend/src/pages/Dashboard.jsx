@@ -26,13 +26,15 @@ function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
+      setLoading(true);
+
       const { data } = await api.get("/dashboard");
 
       setSummary(data.summary);
       setDiscrepancies(data.discrepancies);
     } catch (error) {
       console.error(error);
-      alert("Could not load dashboard");
+      alert("Failed to load dashboard");
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div className="container mt-5">
+      <div className="container mt-5 text-center">
         <h3>Loading Dashboard...</h3>
       </div>
     );
@@ -80,7 +82,7 @@ function Dashboard() {
         </div>
 
         <div className="mt-5">
-          <UploadForm />
+          <UploadForm onUploadSuccess={fetchDashboard} />
         </div>
 
         <div className="mt-5">

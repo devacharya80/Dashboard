@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 
-function UploadForm() {
+function UploadForm({ onUploadSuccess }) {
   const [ordersFile, setOrdersFile] = useState(null);
   const [paymentsFile, setPaymentsFile] = useState(null);
 
@@ -28,6 +28,13 @@ function UploadForm() {
       });
 
       alert(data.message);
+
+      setOrdersFile(null);
+      setPaymentsFile(null);
+
+      if (onUploadSuccess) {
+        await onUploadSuccess();
+      }
     } catch (error) {
       alert(error.response?.data?.message || "Upload Failed");
     } finally {
@@ -36,7 +43,7 @@ function UploadForm() {
   };
 
   return (
-    <div className="card shadow">
+    <div className="card shadow-sm">
       <div className="card-body">
         <h4 className="mb-4">Upload CSV Files</h4>
 
