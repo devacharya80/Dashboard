@@ -6,6 +6,8 @@ import UploadForm from "../components/UploadForm";
 import DashboardChart from "../components/DashboardChart";
 import DiscrepancyTable from "../components/DiscrepancyTable";
 
+import Loader from "../components/Loader";
+
 import api from "../services/api";
 
 function Dashboard() {
@@ -50,11 +52,7 @@ function Dashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="container mt-5 text-center">
-        <h3>Loading Dashboard...</h3>
-      </div>
-    );
+    return <Loader text="Loading Dashboard..." />;
   }
 
   return (
