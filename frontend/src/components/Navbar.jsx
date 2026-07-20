@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
@@ -11,14 +11,20 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-      <div className="container">
-        <span className="navbar-brand fw-bold">
-          Financial Reconciliation Dashboard
-        </span>
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div className="container-fluid px-4">
+        {/* Brand */}
+        <a className="navbar-brand fw-bold fs-4" href="/dashboard">
+          📊 Financial Reconciliation Dashboard
+        </a>
 
+        {/* User Info */}
         <div className="d-flex align-items-center">
-          <span className="text-white me-3">Welcome, {user?.name}</span>
+          <div className="text-end me-4">
+            <div className="text-white fw-semibold">{user?.name}</div>
+
+            <small className="text-light">{user?.email}</small>
+          </div>
 
           <button className="btn btn-outline-light" onClick={handleLogout}>
             Logout
