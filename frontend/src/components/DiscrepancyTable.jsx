@@ -1,8 +1,13 @@
 import { useState } from "react";
+import api from "../services/api";
+import ExplanationModal from "./ExplanationModal";
 
 function DiscrepancyTable({ discrepancies }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [explanation, setExplanation] = useState("");
 
   const filtered = discrepancies.filter((item) => {
     const matchesSearch = (item.orderId || item.orderReference || "")
@@ -13,6 +18,22 @@ function DiscrepancyTable({ discrepancies }) {
 
     return matchesSearch && matchesFilter;
   });
+
+  const handleExplain = async (id) => {
+    try {
+      setShowModal(true);
+
+      setLoadingAI(true);
+
+      const { data } = await api.get(`/ai/${id}/explain`);
+
+      setExplanation(data.explanation);
+    } catch (error) {
+      setExplanation("Unable to generate explanation.");
+    } finally {
+      setLoadingAI(false);
+    }
+  };
 
   return (
     <div className="card shadow">
@@ -73,13 +94,24 @@ function DiscrepancyTable({ discrepancies }) {
                 <td>{item.orderId || item.orderReference}</td>
 
                 <td>
-                  <button className="btn btn-primary btn-sm">Explain</button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleExplain(item._id)}
+                  >
+                    Explain
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <ExplanationModal
+        show={showModal}
+        loading={loadingAI}
+        explanation={explanation}
+        onClose={() => setShowModal(false)}
+      />
     </div>
   );
 }
