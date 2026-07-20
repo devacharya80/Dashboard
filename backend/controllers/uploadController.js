@@ -1,5 +1,6 @@
 import Order from "../models/Order.js";
 import Payment from "../models/Payment.js";
+import Discrepancy from "../models/Discrepancy.js";
 
 import parseOrders from "../utils/parseOrders.js";
 import parsePayments from "../utils/parsePayment.js";
@@ -32,6 +33,17 @@ export const uploadFiles = async (req, res) => {
     await Payment.insertMany(payments);
 
     const discrepancies = await reconcile(userId);
+
+    await Discrepancy.deleteMany({
+      user: userId,
+    });
+
+    await Discrepancy.insertMany(
+      discrepancies.map((d) => ({
+        ...d,
+        user: userId,
+      })),
+    );
 
     res.status(200).json({
       success: true,
