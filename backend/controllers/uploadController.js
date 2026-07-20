@@ -1,3 +1,9 @@
+import Order from "../models/Order.js";
+import Payment from "../models/Payment.js";
+
+import parseOrders from "../utils/parseOrders.js";
+import parsePayments from "../utils/parsePayment.js";
+
 export const uploadFiles = async (req, res) => {
   try {
     const ordersFile = req.files?.orders?.[0];
@@ -10,20 +16,32 @@ export const uploadFiles = async (req, res) => {
       });
     }
 
+    const userId = req.user._id;
+
+    // Parse CSV files
+    const orders = await parseOrders(ordersFile.buffer, userId);
+    const payments = await parsePayments(paymentsFile.buffer, userId);
+
+    // Remove previous uploaded data
+    await Order.deleteMany({ user: userId });
+    await Payment.deleteMany({ user: userId });
+
+    // Insert new data
+    await Order.insertMany(orders);
+    await Payment.insertMany(payments);
+
     res.status(200).json({
       success: true,
-      message: "Files uploaded successfully.",
-      files: {
-        orders: ordersFile.originalname,
-        payments: paymentsFile.originalname,
-      },
+      message: "Data uploaded successfully.",
+      ordersImported: orders.length,
+      paymentsImported: payments.length,
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: `Internal Server Error, Message: ${error.message}`,
     });
   }
 };

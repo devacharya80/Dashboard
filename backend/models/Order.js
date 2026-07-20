@@ -36,7 +36,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["completed", "cancelled"],
+      enum: ["completed", "cancelled", "refunded"],
       required: [true, "Status must be either completed or cancelled"],
     },
     user: {
@@ -50,7 +50,7 @@ const orderSchema = new mongoose.Schema(
   },
 );
 
-orderSchema.index({ user: 1, orderId: 1 }, { unique: true });
+// orderSchema.index({ user: 1, orderId: 1 }, { unique: true });
 
 const Order = mongoose.model("Order", orderSchema);
 export default Order;
