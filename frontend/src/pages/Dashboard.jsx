@@ -13,6 +13,11 @@ function Dashboard() {
     totalOrders: 0,
     totalPayments: 0,
     totalDiscrepancies: 0,
+
+    totalValueReconciled: 0,
+    totalValueInDispute: 0,
+    moneyAtRisk: 0,
+
     missingPayments: 0,
     orphanPayments: 0,
     amountMismatches: 0,
@@ -34,7 +39,7 @@ function Dashboard() {
       setDiscrepancies(data.discrepancies);
     } catch (error) {
       console.error(error);
-      alert("Failed to load dashboard");
+      alert("Failed to load dashboard.");
     } finally {
       setLoading(false);
     }
@@ -57,38 +62,42 @@ function Dashboard() {
       <Navbar />
 
       <div className="container mt-4">
+        {/* Summary Cards */}
         <div className="row g-4">
-          <div className="col-md-3">
+          <div className="col-lg-3 col-md-6">
             <SummaryCard title="Orders" value={summary.totalOrders} />
           </div>
 
-          <div className="col-md-3">
+          <div className="col-lg-3 col-md-6">
             <SummaryCard title="Payments" value={summary.totalPayments} />
           </div>
 
-          <div className="col-md-3">
+          <div className="col-lg-3 col-md-6">
             <SummaryCard
-              title="Discrepancies"
-              value={summary.totalDiscrepancies}
+              title="Reconciled Value"
+              value={`$${summary.totalValueReconciled.toFixed(2)}`}
             />
           </div>
 
-          <div className="col-md-3">
+          <div className="col-lg-3 col-md-6">
             <SummaryCard
-              title="Missing Payments"
-              value={summary.missingPayments}
+              title="Money At Risk"
+              value={`$${summary.moneyAtRisk.toFixed(2)}`}
             />
           </div>
         </div>
 
+        {/* Upload Section */}
         <div className="mt-5">
           <UploadForm onUploadSuccess={fetchDashboard} />
         </div>
 
+        {/* Chart */}
         <div className="mt-5">
           <DashboardChart summary={summary} />
         </div>
 
+        {/* Discrepancy Table */}
         <div className="mt-5">
           <DiscrepancyTable discrepancies={discrepancies} />
         </div>

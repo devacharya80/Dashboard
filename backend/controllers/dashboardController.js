@@ -6,17 +6,78 @@ export const getDashboard = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const totalOrders = await Order.countDocuments({ user: userId });
-    const totalPayments = await Payment.countDocuments({ user: userId });
+    const orders = await Order.find({ user: userId });
+    const payments = await Payment.find({ user: userId });
 
-    const discrepancies = await Discrepancy.find({ user: userId }).sort({
+    const discrepancies = await Discrepancy.find({
+      user: userId,
+    }).sort({
       createdAt: -1,
     });
+
+    const totalOrders = orders.length;
+    const totalPayments = payments.length;
+
+    // Total value of all orders
+    const totalOrderValue = orders.reduce(
+      (sum, order) => sum + (order.netAmount || 0),
+      0,
+    );
+
+    // Total value of all payments
+    const totalPaymentValue = payments.reduce(
+      (sum, payment) => sum + (payment.amount || 0),
+      0,
+    );
+
+    // Total value reconciled
+    const totalValueReconciled = Math.min(totalOrderValue, totalPaymentValue);
+
+    // Total value in dispute
+    let totalValueInDispute = 0;
+
+    // Money at risk
+    let moneyAtRisk = 0;
+
+    for (const discrepancy of discrepancies) {
+      switch (discrepancy.type) {
+        case "MISSING_PAYMENT":
+          totalValueInDispute += discrepancy.orderAmount || 0;
+          moneyAtRisk += discrepancy.orderAmount || 0;
+          break;
+
+        case "ORPHAN_PAYMENT":
+          totalValueInDispute += discrepancy.paymentAmount || 0;
+          moneyAtRisk += discrepancy.paymentAmount || 0;
+          break;
+
+        case "AMOUNT_MISMATCH":
+          totalValueInDispute += Math.abs(
+            (discrepancy.orderAmount || 0) - (discrepancy.paidAmount || 0),
+          );
+
+          moneyAtRisk += Math.abs(
+            (discrepancy.orderAmount || 0) - (discrepancy.paidAmount || 0),
+          );
+
+          break;
+
+        default:
+          break;
+      }
+    }
 
     const summary = {
       totalOrders,
       totalPayments,
+
       totalDiscrepancies: discrepancies.length,
+
+      totalValueReconciled,
+
+      totalValueInDispute,
+
+      moneyAtRisk,
 
       missingPayments: discrepancies.filter((d) => d.type === "MISSING_PAYMENT")
         .length,
