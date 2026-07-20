@@ -3,6 +3,7 @@ import Payment from "../models/Payment.js";
 
 import parseOrders from "../utils/parseOrders.js";
 import parsePayments from "../utils/parsePayment.js";
+import reconcile from "../utils/reconcile.js";
 
 export const uploadFiles = async (req, res) => {
   try {
@@ -29,6 +30,8 @@ export const uploadFiles = async (req, res) => {
     // Insert new data
     await Order.insertMany(orders);
     await Payment.insertMany(payments);
+
+    const discrepancies = await reconcile(userId);
 
     res.status(200).json({
       success: true,
